@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags for character encoding and responsive design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Friend - Cool Booking System</title>
+    
+    <style>
+        /* ========== RESET AND BASE STYLES ========== */
+        /* Remove default margin and padding from all elements */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; /* Include padding and border in element's total width/height */
+        }
+
+        /* Set up the body with our color scheme */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Clean, modern font */
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); /* Diagonal gradient background */
+            color: #e0e0e0; /* Light grey text for readability */
+            min-height: 100vh; /* Minimum height of viewport */
+            padding: 20px;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        /* ========== HEADER STYLES ========== */
+        /* Main header container */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.3); /* Semi-transparent black background */
+            border-radius: 15px; /* Rounded corners */
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); /* Drop shadow for depth */
+        }
+
+        /* Main title styling */
+        h1 {
+            font-size: 3rem; /* Large font size */
+            background: linear-gradient(45deg, #666, #fff, #999); /* Gradient text effect */
+            -webkit-background-clip: text; /* Clip background to text */
+            -webkit-text-fill-color: transparent; /* Make text transparent to show gradient */
+            background-clip: text;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite; /* Animated glow effect */
+        }
+
+        /* Subtitle styling */
+        .subtitle {
+            color: #888; /* Medium grey */
+            font-size: 1.2rem;
+            font-weight: 300; /* Light font weight */
+        }
+
+        /* Keyframes for the glowing animation */
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); } /* Normal brightness at start and end */
+            50% { filter: brightness(1.3); } /* Brighter in the middle */
+        }
+
+        /* ========== GRID CONTAINER ========== */
+        /* Container for all friend cards */
+        .friends-grid {
+            display: grid; /* Use CSS Grid layout */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+            gap: 30px; /* Space between cards */
+            max-width: 1400px; /* Maximum width of grid */
+            margin: 0 auto; /* Center the grid */
+            padding: 20px;
+        }
+
+        /* ========== FRIEND CARD STYLES ========== */
+        /* Individual friend card */
+        .friend-card {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f); /* Subtle gradient */
+            border-radius: 20px; /* Rounded corners */
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); /* Deep shadow */
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            border: 1px solid #333; /* Subtle border */
+            position: relative; /* For absolute positioning of child elements */
+            overflow: hidden; /* Hide overflow for effects */
+        }
+
+        /* Hover effect for friend cards */
+        .friend-card:hover {
+            transform: translateY(-10px); /* Lift card up */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); /* Deeper shadow on hover */
+            border-color: #555; /* Lighter border on hover */
+        }
+
+        /* Image container within card */
+        .friend-image {
+            width: 100%; /* Full width of card */
+            height: 300px; /* Fixed height */
+            background: #1a1a1a; /* Dark background placeholder */
+            border-radius: 15px; /* Rounded corners */
+            margin-bottom: 20px;
+            display: flex; /* Flexbox for centering */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            overflow: hidden; /* Hide overflow */
+            border: 2px solid #333; /* Border around image area */
+            position: relative; /* For overlay effects */
+        }
+
+        /* Styling for actual images when added */
+        .friend-image img {
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            object-fit: contain; /* Fit entire image within the area without cropping */
+            transition: transform 0.3s ease; /* Smooth zoom transition */
+        }
+
+        /* Zoom effect on image hover */
+        .friend-card:hover .friend-image img {
+            transform: scale(1.1); /* Zoom in by 10% */
+        }
+
+        /* Placeholder text for images */
+        .placeholder-text {
+            color: #555; /* Dark grey text */
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Name styling */
+        .friend-name {
+            font-size: 1.8rem; /* Large name text */
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff; /* White text */
+            text-align: center;
+        }
+
+        /* Status badge */
+        .status {
+            display: inline-block; /* Inline block for padding */
+            padding: 8px 16px;
+            border-radius: 20px; /* Pill shape */
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Available status - green tint */
+        .status.available {
+            background: rgba(0, 255, 100, 0.1); /* Semi-transparent green */
+            color: #00ff64; /* Bright green text */
+            border: 1px solid rgba(0, 255, 100, 0.3); /* Green border */
+        }
+
+        /* Booked status - red tint */
+        .status.booked {
+            background: rgba(255, 0, 100, 0.1); /* Semi-transparent red */
+            color: #ff0064; /* Bright red text */
+            border: 1px solid rgba(255, 0, 100, 0.3); /* Red border */
+        }
+
+        /* ========== BOOKING FORM STYLES ========== */
+        /* Container for booking controls */
+        .booking-section {
+            margin-top: 20px;
+        }
+
+        /* Form group for inputs */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Label styling */
+        label {
+            display: block; /* Block level for full width */
+            margin-bottom: 8px;
+            color: #aaa; /* Light grey */
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Input field styling */
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            width: 100%; /* Full width */
+            padding: 12px; /* Internal spacing */
+            background: #1a1a1a; /* Dark background */
+            border: 1px solid #333; /* Subtle border */
+            border-radius: 8px; /* Rounded corners */
+            color: #e0e0e0; /* Light text */
+            font-size: 1rem;
+            transition: all 0.3s ease; /* Smooth transitions */
+        }
+
+        /* Focus state for inputs */
+        input:focus,
+        textarea:focus {
+            outline: none; /* Remove default outline */
+            border-color: #666; /* Lighter border on focus */
+            background: #252525; /* Slightly lighter background */
+            box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1); /* Subtle glow */
+        }
+
+        /* Textarea specific styling */
+        textarea {
+            resize: vertical; /* Allow vertical resize only */
+            min-height: 80px; /* Minimum height */
+        }
+
+        /* ========== BUTTON STYLES ========== */
+        /* Primary book button */
+        .book-btn {
+            width: 100%; /* Full width */
+            padding: 15px;
+            background: linear-gradient(135deg, #444, #666); /* Gradient background */
+            color: #fff; /* White text */
+            border: none; /* No border */
+            border-radius: 10px; /* Rounded corners */
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: all 0.3s ease; /* Smooth transitions */
+            position: relative; /* For pseudo-elements */
+            overflow: hidden; /* Hide overflow for effects */
+        }
+
+        /* Hover effect for book button */
+        .book-btn:hover {
+            background: linear-gradient(135deg, #555, #777); /* Lighter gradient */
+            transform: translateY(-2px); /* Slight lift */
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1); /* Glow effect */
+        }
+
+        /* Active/pressed state for button */
+        .book-btn:active {
+            transform: translateY(0); /* Return to normal position */
+        }
+
+        /* Disabled button state */
+        .book-btn:disabled {
+            background: #2a2a2a; /* Dark grey */
+            color: #555; /* Darker text */
+            cursor: not-allowed; /* Not-allowed cursor */
+            transform: none; /* No transform */
+        }
+
+        /* ========== MODAL/POPUP STYLES ========== */
+        /* Modal overlay background */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed positioning */
+            top: 0;
+            left: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
+            z-index: 1000; /* High z-index to appear on top */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
+
+        /* Modal content box */
+        .modal-content {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f); /* Gradient background */
+            padding: 40px;
+            border-radius: 20px; /* Rounded corners */
+            max-width: 500px; /* Maximum width */
+            width: 90%; /* Responsive width */
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9); /* Deep shadow */
+            border: 1px solid #444; /* Subtle border */
+            animation: slideIn 0.3s ease; /* Slide in animation */
+        }
+
+        /* Keyframes for modal slide-in animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px); /* Start above */
+                opacity: 0; /* Start invisible */
+            }
+            to {
+                transform: translateY(0); /* End at normal position */
+                opacity: 1; /* End fully visible */
+            }
+        }
+
+        /* Modal title */
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #fff; /* White text */
+            font-size: 1.8rem;
+        }
+
+        /* Modal paragraph text */
+        .modal p {
+            margin-bottom: 15px;
+            color: #aaa; /* Light grey */
+            line-height: 1.6; /* Increased line height for readability */
+        }
+
+        /* Close button for modal */
+        .close-btn {
+            width: 100%; /* Full width */
+            padding: 12px;
+            background: #333; /* Dark grey */
+            color: #fff; /* White text */
+            border: none; /* No border */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background 0.3s ease; /* Smooth transition */
+        }
+
+        /* Hover effect for close button */
+        .close-btn:hover {
+            background: #444; /* Lighter grey on hover */
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        /* Media query for mobile devices */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem; /* Smaller title on mobile */
+            }
+            
+            .friends-grid {
+                grid-template-columns: 1fr; /* Single column on mobile */
+                gap: 20px; /* Smaller gap */
+            }
+            
+            .friend-image {
+                height: 250px; /* Shorter image height */
+            }
+        }
+
+        /* ========== UTILITY CLASSES ========== */
+        /* Center text alignment utility */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Margin top utility */
+        .mt-2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== HEADER SECTION ========== -->
+    <header>
+        <h1>Book A Valentine </h1>
+        <p class="subtitle">Select a date and book a time!</p>
+    </header>
+
+    <!-- ========== MAIN CONTENT - FRIENDS GRID ========== -->
+    <div class="friends-grid" id="friendsGrid">
+        <!-- Friend cards will be generated here by JavaScript -->
+    </div>
+
+    <!-- ========== CONFIRMATION MODAL ========== -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h2>Booking Confirmed! 🎉</h2>
+            <p id="confirmationMessage"></p>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== FRIEND DATA ARRAY ==========
+        // Array containing all friend objects with their information
+        const friends = [
+            { 
+                name: 'Dale', 
+                id: 'dale', 
+                image: 'BookRendaniAndDale/Dale.jpg', // Image path will be added manually
+                available: true // Availability status
+            },
+            { 
+                name: 'Rendani', 
+                id: 'rendani', 
+                image: 'BookRendaniAndDale/Rendani.jpg', 
+                available: true 
+            },
+            { 
+                name: 'Ompha', 
+                id: 'ompha', 
+                image: 'BookRendaniAndDale/Ompha.jpg', 
+                available: true 
+            },
+            { 
+                name: 'Liam A', 
+                id: 'liam-a', 
+                image: 'BookRendaniAndDale/Liam A.JPG', 
+                available: true 
+            },
+            { 
+                name: 'Liam S', 
+                id: 'liam-s', 
+                image: 'BookRendaniAndDale/Liam S.JPG', 
+                available: true 
+            },
+            { 
+                name: 'Lake', 
+                id: 'lake', 
+                image: 'BookRendaniAndDale/Lake.jpg', 
+                available: true 
+            }
+        ];
+
+        // ========== BOOKINGS STORAGE ==========
+        // Object to store all bookings, using friend ID as key
+        let bookings = {};
+
+        // ========== INITIALIZATION FUNCTION ==========
+        // This function runs when the page loads
+        function initializePage() {
+            // Get the container element where cards will be added
+            const gridContainer = document.getElementById('friendsGrid');
+            
+            // Loop through each friend in the friends array
+            friends.forEach(friend => {
+                // Create a card for each friend
+                const card = createFriendCard(friend);
+                // Add the card to the grid container
+                gridContainer.appendChild(card);
+            });
+        }
+
+        // ========== CREATE FRIEND CARD FUNCTION ==========
+        // Function to create HTML elements for a friend card
+        function createFriendCard(friend) {
+            // Create a new div element for the card
+            const card = document.createElement('div');
+            // Add the CSS class for styling
+            card.className = 'friend-card';
+            // Set a unique ID for this card
+            card.id = `card-${friend.id}`;
+
+            // Create the HTML content for the card
+            // Using template literals for multi-line HTML
+            card.innerHTML = `
+                <!-- Image container -->
+                <div class="friend-image">
+                    ${friend.image 
+                        ? `<img src="${friend.image}" alt="${friend.name}">` // Show image if available
+                        : `<div class="placeholder-text">Add ${friend.name}'s photo here</div>` // Show placeholder if no image
+                    }
+                </div>
+                
+                <!-- Friend's name -->
+                <h2 class="friend-name">${friend.name}</h2>
+                
+                <!-- Status badge -->
+                <div class="text-center">
+                    <span class="status ${friend.available ? 'available' : 'booked'}" id="status-${friend.id}">
+                        ${friend.available ? 'Available' : 'Booked'}
+                    </span>
+                </div>
+                
+                <!-- Booking form section -->
+                <div class="booking-section">
+                    <!-- Your name input -->
+                    <div class="form-group">
+                        <label for="name-${friend.id}">Your Name</label>
+                        <input type="text" id="name-${friend.id}" placeholder="Enter your name">
+                    </div>
+                    
+                    <!-- Date picker -->
+                    <div class="form-group">
+                        <label for="date-${friend.id}">Date</label>
+                        <input type="date" id="date-${friend.id}">
+                    </div>
+                    
+                    <!-- Time picker -->
+                    <div class="form-group">
+                        <label for="time-${friend.id}">Time</label>
+                        <input type="time" id="time-${friend.id}">
+                    </div>
+                    
+                    <!-- Optional message -->
+                    <div class="form-group">
+                        <label for="message-${friend.id}">Message (Optional)</label>
+                        <textarea id="message-${friend.id}" placeholder="Any special requests or activities?"></textarea>
+                    </div>
+                    
+                    <!-- Book button with onclick event -->
+                    <button class="book-btn" onclick="bookFriend('${friend.id}')" id="btn-${friend.id}">
+                        Book ${friend.name}
+                    </button>
+                </div>
+            `;
+
+            // Return the completed card element
+            return card;
+        }
+
+        // ========== BOOK FRIEND FUNCTION ==========
+        // Function called when user clicks the book button
+        function bookFriend(friendId) {
+            // Get all the input values from the form
+            const nameInput = document.getElementById(`name-${friendId}`);
+            const dateInput = document.getElementById(`date-${friendId}`);
+            const timeInput = document.getElementById(`time-${friendId}`);
+            const messageInput = document.getElementById(`message-${friendId}`);
+
+            // Get the actual values from the inputs
+            const name = nameInput.value.trim(); // trim() removes whitespace
+            const date = dateInput.value;
+            const time = timeInput.value;
+            const message = messageInput.value.trim();
+
+            // Validate that required fields are filled
+            if (!name) {
+                // Show alert if name is missing
+                alert('Please enter your name!');
+                // Focus on the name input for user convenience
+                nameInput.focus();
+                return; // Exit the function early
+            }
+
+            if (!date) {
+                // Show alert if date is missing
+                alert('Please select a date!');
+                // Focus on the date input
+                dateInput.focus();
+                return; // Exit the function early
+            }
+
+            if (!time) {
+                // Show alert if time is missing
+                alert('Please select a time!');
+                // Focus on the time input
+                timeInput.focus();
+                return; // Exit the function early
+            }
+
+            // Find the friend object from the friends array
+            const friend = friends.find(f => f.id === friendId);
+
+            // Create a booking object with all the details
+            const booking = {
+                friendName: friend.name, // Name of friend being booked
+                bookedBy: name, // Name of person booking
+                date: date, // Date of booking
+                time: time, // Time of booking
+                message: message, // Optional message
+                timestamp: new Date().toISOString() // Current timestamp for record
+            };
+
+            // Store the booking in our bookings object
+            bookings[friendId] = booking;
+
+            // Update the friend's availability status to false
+            friend.available = false;
+
+            // Update the UI to reflect the booking
+            updateCardStatus(friendId, false);
+
+            // Show confirmation modal with booking details
+            showConfirmation(booking);
+
+            // Clear all the form inputs
+            nameInput.value = '';
+            dateInput.value = '';
+            timeInput.value = '';
+            messageInput.value = '';
+        }
+
+        // ========== UPDATE CARD STATUS FUNCTION ==========
+        // Function to update the visual status of a friend card
+        function updateCardStatus(friendId, isAvailable) {
+            // Get the status badge element
+            const statusElement = document.getElementById(`status-${friendId}`);
+            // Get the book button element
+            const buttonElement = document.getElementById(`btn-${friendId}`);
+
+            if (isAvailable) {
+                // If available: show green status
+                statusElement.className = 'status available';
+                statusElement.textContent = 'Available';
+                // Enable the button
+                buttonElement.disabled = false;
+            } else {
+                // If not available: show red status
+                statusElement.className = 'status booked';
+                statusElement.textContent = 'Booked';
+                // Disable the button
+                buttonElement.disabled = true;
+            }
+        }
+
+        // ========== SHOW CONFIRMATION MODAL ==========
+        // Function to display the confirmation popup
+        function showConfirmation(booking) {
+            // Get the modal element
+            const modal = document.getElementById('confirmationModal');
+            // Get the message element inside the modal
+            const messageElement = document.getElementById('confirmationMessage');
+
+            // Format the date to be more readable
+            const formattedDate = new Date(booking.date).toLocaleDateString('en-US', {
+                weekday: 'long', // Show day of week
+                year: 'numeric', // Show year
+                month: 'long', // Show full month name
+                day: 'numeric' // Show day number
+            });
+
+            // Create the confirmation message with all booking details
+            let confirmationText = `
+                <strong>${booking.bookedBy}</strong>, you've successfully booked <strong>${booking.friendName}</strong>!<br><br>
+                📅 Date: ${formattedDate}<br>
+                ⏰ Time: ${booking.time}<br>
+            `;
+
+            // Add the message if one was provided
+            if (booking.message) {
+                confirmationText += `💬 Message: ${booking.message}<br>`;
+            }
+
+            // Add a closing message
+            confirmationText += `<br>Get ready for an awesome hangout! 🎊`;
+
+            // Set the message in the modal
+            messageElement.innerHTML = confirmationText;
+            
+            // Show the modal by changing display to flex
+            modal.style.display = 'flex';
+        }
+
+        // ========== CLOSE MODAL FUNCTION ==========
+        // Function to hide the confirmation modal
+        function closeModal() {
+            // Get the modal element
+            const modal = document.getElementById('confirmationModal');
+            // Hide the modal by setting display to none
+            modal.style.display = 'none';
+        }
+
+        // ========== CLICK OUTSIDE MODAL TO CLOSE ==========
+        // Event listener for clicking anywhere on the page
+        window.onclick = function(event) {
+            // Get the modal element
+            const modal = document.getElementById('confirmationModal');
+            // Check if the click was directly on the modal background (not the content)
+            if (event.target === modal) {
+                // Close the modal
+                closeModal();
+            }
+        }
+
+        // ========== PAGE LOAD EVENT ==========
+        // Run initialization when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Call the initialization function
+            initializePage();
+            
+            // Set minimum date to today for all date inputs
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+            // Get all date input elements
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            // Loop through each date input
+            dateInputs.forEach(input => {
+                // Set the minimum date to today (prevents booking in the past)
+                input.min = today;
+            });
+        });
+
+        // ========== CONSOLE LOG FOR DEBUGGING ==========
+        // Log a message when the script loads
+        console.log('Booking system initialized!');
+        // Log the friends array for debugging
+        console.log('Friends:', friends);
+    </script>
+</body>
+</html>
